@@ -2,6 +2,7 @@ const express = require('express');
 const dbConnect = require('./config/db_connect');
 const bodyParser = require('body-parser');
 const app = express();
+// eslint-disable-next-line no-unused-vars
 const dotenv = require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const authRouter = require('./routes/auth_routes');
