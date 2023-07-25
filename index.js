@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 // eslint-disable-next-line no-unused-vars
 const dotenv = require('dotenv').config();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4444;
 const authRouter = require('./routes/auth_routes');
 const quizRouter = require('./routes/quiz_routes');
 const questionRouter = require('./routes/question_routes');
