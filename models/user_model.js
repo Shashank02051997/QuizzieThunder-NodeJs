@@ -29,6 +29,14 @@ var userSchema = new mongoose.Schema({
         type: String,
         default: "user",
     },
+    isMobileNumberVerified: {
+        type: Boolean,
+        default: false
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
     isBlocked: {
         type: Boolean,
         default: false
