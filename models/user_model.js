@@ -29,6 +29,14 @@ var userSchema = new mongoose.Schema({
         type: String,
         default: "user",
     },
+    isMobileNumberVerified: {
+        type: Boolean,
+        default: false
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
     isBlocked: {
         type: Boolean,
         default: false
@@ -41,6 +49,9 @@ userSchema.pre('save', async function () {
 })
 
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
+    /*console.log('enteredPassword = ', enteredPassword + ' password = ' + this.password);
+    const isMatch = bcrypt.compareSync('shashank', '$2b$10$iGvq0i56G7hQAYLKN.nsFe78AVb9TPJ2d86gk5GdZNZlAxPGmy.qu');
+    console.log('isMatch = ', isMatch);*/
     return await bcrypt.compareSync(enteredPassword, this.password);
 }
 
