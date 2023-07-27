@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { createUser, loginUser, adminLogin, getAllUsers, getSpecificUser,
-    deleteSpecificUser, updateUser, updateUserBlockStatus, logout, forgotPassword, resetPassword } = require('../controller/user_controller');
+    deleteSpecificUser, updateUser, updateUserBlockStatus, logout,
+    forgotPassword, resetPassword, verifyMobileOtp } = require('../controller/user_controller');
 const { authMiddleware, isAdmin } = require('../middlewares/auth_middleware');
 
 router.post('/register', createUser);
+router.post('/verify/mobile-otp', verifyMobileOtp);
+//router.post('/verify/email-otp', verifyEmailOtp);
 router.post('/login', loginUser);
 router.post('/admin-login', adminLogin);
 router.get('/all-users', authMiddleware, isAdmin, getAllUsers);
