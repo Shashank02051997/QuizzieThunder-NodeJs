@@ -96,8 +96,16 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
             }
 
             // If the OTP is not expired, mark the mobile number as verified in the user document
-            user.isMobileNumberVerified = true;
-            await user.save();
+
+            await User.findByIdAndUpdate(
+                user._id,
+                {
+                    isMobileNumberVerified: true
+                },
+                {
+                    new: true,
+                }
+            );
 
             // Delete the OTP document after successful verification
             await otpDocument.deleteOne();
@@ -407,6 +415,6 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 module.exports = {
-    createUser, verifyMobileOtp, loginUser, adminLogin, getAllUsers, getSpecificUser, deleteSpecificUser,
+    createUser, loginUser, verifyMobileOtp, adminLogin, getAllUsers, getSpecificUser, deleteSpecificUser,
     updateUser, updateUserBlockStatus, logout, forgotPassword, resetPassword
 };
