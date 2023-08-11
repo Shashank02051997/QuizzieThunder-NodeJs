@@ -41,6 +41,9 @@ var userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    about: {
+        type: String,
+    }
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

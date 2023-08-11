@@ -96,7 +96,6 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
             }
 
             // If the OTP is not expired, mark the mobile number as verified in the user document
-
             await User.findByIdAndUpdate(
                 user._id,
                 {
@@ -235,7 +234,7 @@ const getSpecificUser = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: 'Invalid user_id format' });
         }
 
-        const user = await User.findById(user_id);
+        const user = await User.findById(user_id).select('-password');
         if (user) {
             res.json(user);
         } else {

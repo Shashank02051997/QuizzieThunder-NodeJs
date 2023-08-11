@@ -6,7 +6,13 @@ const asyncHandler = require('express-async-handler');
 
 const createQuestion = asyncHandler(async (req, res) => {
 
+    const quiz_id = req.body.quiz;
+
     try {
+        // Check if the provided question_id is a valid ObjectId
+        if (!validateMongoDbId(quiz_id)) {
+            return res.status(400).json({ message: 'Invalid quiz id format' });
+        }
 
         // Create a new question using the Question model
         const newQuestion = await Question.create(req.body);
@@ -18,18 +24,18 @@ const createQuestion = asyncHandler(async (req, res) => {
 });
 
 
-const getQuestionsByQuizId = asyncHandler(async (req, res) => {
+const getAllQuestionsFromQuizId = asyncHandler(async (req, res) => {
     const { quiz_id } = req.params;
 
     try {
 
         // Check if the provided quiz_id is a valid ObjectId
         if (!validateMongoDbId(quiz_id)) {
-            return res.status(400).json({ message: 'Invalid quiz_id format' });
+            return res.status(400).json({ message: 'Invalid quiz id format' });
         }
 
         // Find the quiz by ID
-        const quiz = await Quiz.findById(quiz_id);
+        const quiz = await Quiz.findById(quiz_id).populate('category');
 
         if (!quiz) {
             return res.status(404).json({ message: 'Quiz not found' });
@@ -128,5 +134,5 @@ const updateQuestion = asyncHandler(async (req, res) => {
 
 module.exports = {
     createQuestion, getSpecificQuestion, deleteSpecificQuestion,
-    updateQuestion, getQuestionsByQuizId
+    updateQuestion, getAllQuestionsFromQuizId
 };

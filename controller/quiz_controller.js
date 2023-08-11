@@ -4,7 +4,7 @@ const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 
 
 const createQuiz = asyncHandler(async (req, res) => {
-    const { title, description } = req.body;
+    const { title, category } = req.body;
 
     try {
         // Check if a quiz with the same title already exists
@@ -13,11 +13,13 @@ const createQuiz = asyncHandler(async (req, res) => {
             return res.status(401).json({ message: 'Quiz with this title already exists' });
         }
 
+        // Check if the provided question_category_id is a valid ObjectId
+        if (!validateMongoDbId(category)) {
+            return res.status(400).json({ message: 'Invalid quiz category id format' });
+        }
+
         // Create a new quiz using the Quiz model
-        const newQuiz = await Quiz.create({
-            title,
-            description,
-        });
+        const newQuiz = await Quiz.create(req.body);
 
         res.status(201).json(newQuiz); // Return the created quiz as the response.
     } catch (err) {

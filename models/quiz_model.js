@@ -11,6 +11,11 @@ const quizSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'QuizCategory',
+        required: true,
+    },
 
 }, { timestamps: true });
 

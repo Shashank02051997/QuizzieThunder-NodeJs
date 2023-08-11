@@ -6,6 +6,7 @@ const app = express();
 const dotenv = require('dotenv').config();
 const PORT = process.env.PORT || 4444;
 const authRouter = require('./routes/auth_routes');
+const quizCategoryRouter = require('./routes/quiz_category_routes');
 const quizRouter = require('./routes/quiz_routes');
 const questionRouter = require('./routes/question_routes');
 const { notFound, errorHandler } = require('./middlewares/error_handler');
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/api/user', authRouter);
+app.use('/api/quiz/category', quizCategoryRouter);
 app.use('/api/quiz', quizRouter);
 app.use('/api/question', questionRouter);
 
