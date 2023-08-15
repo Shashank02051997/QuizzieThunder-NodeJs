@@ -33,7 +33,7 @@ const createUser = asyncHandler(
             }
             else {
                 if (findUser.isMobileNumberVerified) {
-                    res.status(401).json({ message: 'User already exists' });
+                    res.json({ code: 404, status: false, message: 'User already exists' });
                 }
                 else {
                     // User already exists, but mobile number is not verified, send OTP again
@@ -59,14 +59,14 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
-            return res.status(400).json({ message: 'Invalid mobile number format' });
+            return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
         // Find the user with the given mobile number
         const user = await User.findOne({ mobile: mobile });
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json({ code: 404, status: false, message: 'User not found' });
         }
 
         // Check if the mobile number is already verified
@@ -78,7 +78,7 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
         const otpDocument = await Otp.findOne({ mobile: mobile });
 
         if (!otpDocument) {
-            return res.status(404).json({ message: 'OTP not found' });
+            return res.json({ code: 404, status: false, message: 'OTP not found' });
         }
 
         // Check if the provided OTP matches the one in the database
@@ -92,7 +92,7 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
 
             if (currentTime - createdAtTime > otpExpirationTime) {
                 // OTP is expired
-                return res.status(401).json({ message: 'OTP has expired' });
+                return res.json({ code: 404, status: false, message: 'OTP has expired' });
             }
 
             // If the OTP is not expired, mark the mobile number as verified in the user document
@@ -111,7 +111,7 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
 
             return res.json({ code: 200, status: true, message: 'Mobile number verified successfully' });
         } else {
-            return res.status(401).json({ message: 'Invalid OTP' });
+            return res.json({ code: 404, status: false, message: 'Invalid OTP' });
         }
     } catch (err) {
         throw new Error(err);
@@ -124,7 +124,7 @@ const loginUser = asyncHandler(async (req, res) => {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
-            return res.status(400).json({ message: 'Invalid mobile number format' });
+            return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
         const user = await User.findOne({ mobile: mobile });
@@ -143,7 +143,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 }
 
                 if (user.isBlocked) {
-                    return res.status(403).json({ message: "You can't login because you are blocked by the admin" });
+                    return res.json({ code: 404, status: false, message: "You can't login because you are blocked by the admin" });
                 }
 
                 const result = {
@@ -157,13 +157,12 @@ const loginUser = asyncHandler(async (req, res) => {
 
                 res.json({
                     code: 200, status: true, message: 'Login successfully', result: result
-
                 });
             } else {
-                res.status(401).json({ message: 'Invalid Credentials' });
+                res.json({ code: 404, status: false, message: 'Invalid Credentials' });
             }
         } else {
-            res.status(401).json({ message: 'Invalid Credentials' });
+            res.json({ code: 404, status: false, message: 'Invalid Credentials' });
         }
     } catch (err) {
         throw new Error(err);
@@ -176,7 +175,7 @@ const adminLogin = asyncHandler(async (req, res) => {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
-            return res.status(400).json({ message: 'Invalid mobile number format' });
+            return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
         const user = await User.findOne({ mobile: mobile });
@@ -193,13 +192,13 @@ const adminLogin = asyncHandler(async (req, res) => {
                         token: generateToken(user._id),
                     });
                 } else {
-                    res.status(401).json({ message: 'Invalid Credentials' });
+                    res.json({ code: 404, status: false, message: 'Invalid Credentials' });
                 }
             } else {
-                res.status(401).json({ message: 'Login as Amdin' });
+                res.json({ code: 404, status: false, message: 'Login as Amdin' });
             }
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
 
     } catch (err) {
@@ -217,7 +216,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
                 users: allUsers,
             });
         } else {
-            res.status(404).json({ message: 'No users found' });
+            res.json({ code: 404, status: false, message: 'No users found' });
         }
     }
     catch (err) {
@@ -231,14 +230,14 @@ const getSpecificUser = asyncHandler(async (req, res) => {
 
         // Check if the provided user_id is a valid ObjectId
         if (!validateMongoDbId(user_id)) {
-            return res.status(400).json({ message: 'Invalid user_id format' });
+            return res.json({ code: 404, status: false, message: 'Invalid user_id format' });
         }
 
         const user = await User.findById(user_id).select('-password');
         if (user) {
             res.json(user);
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -251,7 +250,7 @@ const deleteSpecificUser = asyncHandler(async (req, res) => {
 
         // Check if the provided user_id is a valid ObjectId
         if (!validateMongoDbId(user_id)) {
-            return res.status(400).json({ message: 'Invalid user_id format' });
+            return res.json({ code: 404, status: false, message: 'Invalid user_id format' });
         }
 
         const deleteUser = await User.findByIdAndDelete(user_id);
@@ -260,7 +259,7 @@ const deleteSpecificUser = asyncHandler(async (req, res) => {
                 message: 'User deleted successfully'
             });
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -274,12 +273,12 @@ const updateUser = asyncHandler(async (req, res) => {
 
         // Check if the provided user_id is a valid ObjectId
         if (!validateMongoDbId(user_id)) {
-            return res.status(400).json({ message: 'Invalid user_id format' });
+            return res.json({ code: 404, status: false, message: 'Invalid user_id format' });
         }
 
         // If the requester is not an admin and is trying to update another user's details, return a 403 Forbidden response.
         if (role !== 'admin' && user_id !== _id.toString()) {
-            return res.status(403).json({ message: 'You do not have permission to update this user' });
+            return res.json({ code: 404, status: false, message: 'You do not have permission to update this user' });
         }
         const updatedUser = await User.findByIdAndUpdate(
             user_id,
@@ -294,7 +293,7 @@ const updateUser = asyncHandler(async (req, res) => {
         if (updateUser) {
             res.json(updatedUser);
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -309,7 +308,7 @@ const updateUserBlockStatus = asyncHandler(async (req, res) => {
 
         // Check if the provided user_id is a valid ObjectId
         if (!validateMongoDbId(user_id)) {
-            return res.status(400).json({ message: 'Invalid user_id format' });
+            return res.json({ code: 404, status: false, message: 'Invalid user_id format' });
         }
 
         const updatedUser = await User.findByIdAndUpdate(
@@ -326,7 +325,7 @@ const updateUserBlockStatus = asyncHandler(async (req, res) => {
             const message = isBlocked ? 'User blocked successfully' : 'User unblocked successfully';
             res.json({ message });
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -344,7 +343,7 @@ const logout = asyncHandler(async (req, res) => {
                 message: 'User logged out successfully'
             });
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -357,7 +356,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
-            return res.status(400).json({ message: 'Invalid mobile number format' });
+            return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
         const user = await User.findOne({ mobile: mobile });
@@ -365,7 +364,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
             res.json(user);
         }
         else {
-            res.status(404).json({ message: 'User not found' });
+            res.json({ code: 404, status: false, message: 'User not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -379,13 +378,13 @@ const resetPassword = asyncHandler(async (req, res, next) => {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
-            return res.status(400).json({ message: 'Invalid mobile number format' });
+            return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
         // Find the user by mobile number.
         const user = await User.findOne({ mobile: mobile });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json({ code: 404, status: false, message: 'User not found' });
         }
 
         // Hash the new password before updating.
@@ -406,7 +405,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
         if (updatedUser) {
             res.json({ message: 'Password updated successfully' });
         } else {
-            res.status(500).json({ message: 'Failed to update password' });
+            res.json({ code: 404, status: false, message: 'Failed to update password' });
         }
     } catch (err) {
         next(err); // Pass the error to the global error handler.
