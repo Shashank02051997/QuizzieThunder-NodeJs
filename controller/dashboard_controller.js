@@ -13,6 +13,7 @@ const getHomeScreenDetails = asyncHandler(async (req, res) => {
         const randomMostPlayedQuiz = lodash.sample(allQuizzes); // Get a random most played quiz
 
         res.json({
+            code: 200, status: true, message: '',
             quizzes: randomQuizzes,
             most_played_quiz: randomMostPlayedQuiz
         });
@@ -42,6 +43,7 @@ const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
         );
 
         res.json({
+            code: 200, status: true, message: '',
             top_pic_quiz: randomTopPickQuiz,
             quiz_categories: quizCategoriesWithCounts
         });
