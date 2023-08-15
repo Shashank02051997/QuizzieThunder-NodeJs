@@ -17,7 +17,7 @@ const quizSchema = new mongoose.Schema({
         required: true,
     },
 
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false });
 
 //Export the model
 module.exports = mongoose.model('Quiz', quizSchema);

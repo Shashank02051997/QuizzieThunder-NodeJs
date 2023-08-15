@@ -8,7 +8,7 @@ const quizCategorySchema = new mongoose.Schema({
         unique: true,
         index: true,
     }
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false });
 
 //Export the model
 module.exports = mongoose.model('QuizCategory', quizCategorySchema);

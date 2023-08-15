@@ -30,15 +30,15 @@ const createQuiz = asyncHandler(async (req, res) => {
 
 const getAllQuiz = asyncHandler(async (req, res) => {
     try {
-        const allQuizs = await Quiz.find();
+        const allQuizzes = await Quiz.find().populate('category');
         const quizCount = await Quiz.countDocuments();
-        if (allQuizs.length > 0) {
+        if (allQuizzes.length > 0) {
             res.json({
                 count: quizCount,
-                quizs: allQuizs,
+                quizzes: allQuizzes,
             });
         } else {
-            res.status(404).json({ message: 'No quizs found' });
+            res.status(404).json({ message: 'No quizzes found' });
         }
     }
     catch (err) {

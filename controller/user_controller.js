@@ -290,11 +290,12 @@ const updateUser = asyncHandler(async (req, res) => {
             {
                 firstname: req.body.firstname,
                 lastname: req.body.lastname,
+                about: req.body.about
             },
             {
                 new: true,
             }
-        );
+        ).select('-password');
         if (updateUser) {
             res.json({ code: 200, status: true, updatedUser: updatedUser });
         } else {
@@ -364,9 +365,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
             return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
-        const user = await User.findOne({ mobile: mobile });
+        const user = await User.findOne({ mobile: mobile }).select('-password');
         if (user) {
-            res.json({ code: 200, status: true, user: user });
+            res.json({ code: 200, status: true, message: '', user: user });
         }
         else {
             res.json({ code: 404, status: false, message: 'User not found' });
@@ -408,7 +409,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
         );
 
         if (updatedUser) {
-            res.json({ code: 200, status: true, message: 'Password updated successfully' });
+            res.json({ code: 200, status: true, message: 'Password updated successfully. Please login' });
         } else {
             res.json({ code: 404, status: false, message: 'Failed to update password' });
         }
