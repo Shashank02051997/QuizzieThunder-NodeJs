@@ -109,7 +109,7 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
             // Delete the OTP document after successful verification
             await otpDocument.deleteOne();
 
-            return res.json({ code: 200, status: true, message: 'Mobile number verified successfully' });
+            return res.json({ code: 200, status: true, message: 'Mobile number verified successfully. Please login' });
         } else {
             return res.json({ code: 404, status: false, message: 'Invalid OTP' });
         }
@@ -183,13 +183,16 @@ const adminLogin = asyncHandler(async (req, res) => {
             if (user.role === 'admin') {
 
                 if (await user.isPasswordMatched(password)) {
-                    res.json({
+                    const result = {
                         _id: user._id,
                         firstname: user.firstname,
                         lastname: user.lastname,
                         email: user.email,
                         mobile: user.mobile,
                         token: generateToken(user._id),
+                    };
+                    res.json({
+                        code: 200, status: true, message: 'Login successfully', result: result
                     });
                 } else {
                     res.json({ code: 404, status: false, message: 'Invalid Credentials' });
@@ -212,6 +215,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         const userCount = await User.countDocuments();
         if (allUsers.length > 0) {
             res.json({
+                code: 200, status: true,
                 count: userCount,
                 users: allUsers,
             });
@@ -235,7 +239,7 @@ const getSpecificUser = asyncHandler(async (req, res) => {
 
         const user = await User.findById(user_id).select('-password');
         if (user) {
-            res.json(user);
+            res.json({ code: 200, status: true, user: user });
         } else {
             res.json({ code: 404, status: false, message: 'User not found' });
         }
@@ -256,6 +260,7 @@ const deleteSpecificUser = asyncHandler(async (req, res) => {
         const deleteUser = await User.findByIdAndDelete(user_id);
         if (deleteUser) {
             res.json({
+                code: 200, status: true,
                 message: 'User deleted successfully'
             });
         } else {
@@ -291,7 +296,7 @@ const updateUser = asyncHandler(async (req, res) => {
             }
         );
         if (updateUser) {
-            res.json(updatedUser);
+            res.json({ code: 200, status: true, updatedUser: updatedUser });
         } else {
             res.json({ code: 404, status: false, message: 'User not found' });
         }
@@ -323,7 +328,7 @@ const updateUserBlockStatus = asyncHandler(async (req, res) => {
 
         if (updatedUser) {
             const message = isBlocked ? 'User blocked successfully' : 'User unblocked successfully';
-            res.json({ message });
+            res.json({ code: 200, status: true, message });
         } else {
             res.json({ code: 404, status: false, message: 'User not found' });
         }
@@ -340,7 +345,7 @@ const logout = asyncHandler(async (req, res) => {
         const user = await User.findById(_id);
         if (user) {
             res.json({
-                message: 'User logged out successfully'
+                code: 200, status: true, message: 'User logged out successfully'
             });
         } else {
             res.json({ code: 404, status: false, message: 'User not found' });
@@ -361,7 +366,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
         const user = await User.findOne({ mobile: mobile });
         if (user) {
-            res.json(user);
+            res.json({ code: 200, status: true, user: user });
         }
         else {
             res.json({ code: 404, status: false, message: 'User not found' });
@@ -403,7 +408,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
         );
 
         if (updatedUser) {
-            res.json({ message: 'Password updated successfully' });
+            res.json({ code: 200, status: true, message: 'Password updated successfully' });
         } else {
             res.json({ code: 404, status: false, message: 'Failed to update password' });
         }
