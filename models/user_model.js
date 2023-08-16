@@ -44,7 +44,7 @@ var userSchema = new mongoose.Schema({
     about: {
         type: String,
     }
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false });
 
 userSchema.pre('save', async function () {
     const salt = await bcrypt.genSaltSync(10);

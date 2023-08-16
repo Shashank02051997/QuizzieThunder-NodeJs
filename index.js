@@ -10,6 +10,7 @@ const quizCategoryRouter = require('./routes/quiz_category_routes');
 const quizRouter = require('./routes/quiz_routes');
 const questionRouter = require('./routes/question_routes');
 const dashboardRouter = require('./routes/dashboard_router');
+const quizResultRouter = require('./routes/quiz_result_routes');
 const { notFound, errorHandler } = require('./middlewares/error_handler');
 const morgan = require('morgan');
 dbConnect();
@@ -23,6 +24,7 @@ app.use('/api/quiz/category', quizCategoryRouter);
 app.use('/api/quiz', quizRouter);
 app.use('/api/question', questionRouter);
 app.use('/api/', dashboardRouter);
+app.use('/api/', quizResultRouter);
 
 app.use(notFound);
 app.use(errorHandler);
