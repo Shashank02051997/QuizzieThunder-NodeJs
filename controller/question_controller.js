@@ -17,7 +17,7 @@ const createQuestion = asyncHandler(async (req, res) => {
         // Create a new question using the Question model
         const newQuestion = await Question.create(req.body);
 
-        res.status(201).json(newQuestion); // Return the created question as the response.
+        res.json({ code: 200, status: true, message: '', newQuestion: newQuestion }); // Return the created question as the response.
     } catch (err) {
         throw new Error(err);
     }
@@ -31,20 +31,21 @@ const getAllQuestionsFromQuizId = asyncHandler(async (req, res) => {
 
         // Check if the provided quiz_id is a valid ObjectId
         if (!validateMongoDbId(quiz_id)) {
-            return res.status(400).json({ message: 'Invalid quiz id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid quiz id format' });
         }
 
         // Find the quiz by ID
         const quiz = await Quiz.findById(quiz_id).populate('category');
 
         if (!quiz) {
-            return res.status(404).json({ message: 'Quiz not found' });
+            return res.json({ code: 404, status: false, message: 'Quiz not found' });
         }
 
         // Find all questions for the given quiz ID and populate the 'quiz' field in each question
         const questions = await Question.find({ quiz: quiz_id }).select('-quiz');
 
         res.json({
+            code: 200, status: true, message: '',
             quiz: quiz,
             questions: questions,
         });
@@ -60,14 +61,14 @@ const getSpecificQuestion = asyncHandler(async (req, res) => {
 
         // Check if the provided question_id is a valid ObjectId
         if (!validateMongoDbId(question_id)) {
-            return res.status(400).json({ message: 'Invalid question_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid question_id format' });
         }
 
         const question = await Question.findById(question_id);
         if (question) {
-            res.json(question);
+            res.json({ code: 200, status: true, message: '', question: question });
         } else {
-            res.status(404).json({ message: 'Question not found' });
+            res.json({ code: 404, status: false, message: 'Question not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -80,16 +81,17 @@ const deleteSpecificQuestion = asyncHandler(async (req, res) => {
 
         // Check if the provided question_id is a valid ObjectId
         if (!validateMongoDbId(question_id)) {
-            return res.status(400).json({ message: 'Invalid question_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid question_id format' });
         }
 
         const deleteQuestion = await Question.findByIdAndDelete(question_id);
         if (deleteQuestion) {
             res.json({
+                code: 200, status: true,
                 message: 'Question deleted successfully'
             });
         } else {
-            res.status(404).json({ message: 'Question not found' });
+            res.json({ code: 404, status: false, message: 'Question not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -103,13 +105,13 @@ const updateQuestion = asyncHandler(async (req, res) => {
     try {
         // Check if the provided question_id is a valid ObjectId
         if (!validateMongoDbId(question_id)) {
-            return res.status(400).json({ message: 'Invalid question_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid question_id format' });
         }
 
         // Find the question by ID
         const existingQuestion = await Question.findById(question_id);
         if (!existingQuestion) {
-            return res.status(404).json({ message: 'Question not found' });
+            return res.json({ code: 404, status: false, message: 'Question not found' });
         }
 
         // Update the question fields
@@ -125,7 +127,7 @@ const updateQuestion = asyncHandler(async (req, res) => {
             }
         );
 
-        res.json(updatedQuestion);
+        res.json({ code: 200, status: true, updatedQuestion: updatedQuestion });
     } catch (err) {
         throw new Error(err);
     }
