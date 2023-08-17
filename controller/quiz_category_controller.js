@@ -11,7 +11,7 @@ const createQuizCategory = asyncHandler(async (req, res) => {
         // Check if a quiz with the same title already exists
         const existingQuizCategory = await QuizCategory.findOne({ title: title });
         if (existingQuizCategory) {
-            return res.status(401).json({ message: 'Quiz Category with this title already exists' });
+            return res.json({ code: 401, status: false, message: 'Quiz Category with this title already exists' });
         }
 
         // Create a new quiz using the Quiz model
@@ -19,7 +19,7 @@ const createQuizCategory = asyncHandler(async (req, res) => {
             title,
         });
 
-        res.status(201).json(newQuizCategory); // Return the created quiz as the response.
+        res.json({ code: 201, status: true, message: '', newQuizCategory: newQuizCategory }); // Return the created quiz as the response.
     } catch (err) {
         throw new Error(err);
     }
@@ -32,11 +32,12 @@ const getAllQuizCategories = asyncHandler(async (req, res) => {
         const quizCategoryCount = await QuizCategory.countDocuments();
         if (allQuizCategories.length > 0) {
             res.json({
+                code: 200, status: true, message: '',
                 count: quizCategoryCount,
                 quiz_categories: allQuizCategories,
             });
         } else {
-            res.status(404).json({ message: 'No quiz category found' });
+            res.json({ code: 404, status: false, message: 'No quiz category found' });
         }
     }
     catch (err) {
@@ -51,14 +52,14 @@ const getSpecificQuizCategory = asyncHandler(async (req, res) => {
 
         // Check if the provided quiz_category_id is a valid ObjectId
         if (!validateMongoDbId(quiz_category_id)) {
-            return res.status(400).json({ message: 'Invalid quiz_category_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid quiz_category_id format' });
         }
 
         const quizCategory = await QuizCategory.findById(quiz_category_id);
         if (quizCategory) {
-            res.json(quizCategory);
+            res.json({ code: 200, status: true, message: '', quizCategory: quizCategory });
         } else {
-            res.status(404).json({ message: 'Quiz Category not found' });
+            res.json({ code: 404, status: false, message: 'Quiz Category not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -72,16 +73,17 @@ const deleteSpecificQuizCategory = asyncHandler(async (req, res) => {
 
         // Check if the provided quiz_category_id is a valid ObjectId
         if (!validateMongoDbId(quiz_category_id)) {
-            return res.status(400).json({ message: 'Invalid quiz_category_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid quiz_category_id format' });
         }
 
         const deleteQuizCategory = await QuizCategory.findByIdAndDelete(quiz_category_id);
         if (deleteQuizCategory) {
             res.json({
+                code: 200, status: true,
                 message: 'Quiz Category deleted successfully'
             });
         } else {
-            res.status(404).json({ message: 'Quiz Category not found' });
+            res.json({ code: 404, status: false, message: 'Quiz Category not found' });
         }
     } catch (err) {
         throw new Error(err);
@@ -96,20 +98,20 @@ const updateQuizCategory = asyncHandler(async (req, res) => {
 
         // Check if the provided quiz_category_id is a valid ObjectId
         if (!validateMongoDbId(quiz_category_id)) {
-            return res.status(400).json({ message: 'Invalid quiz_category_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid quiz_category_id format' });
         }
 
         // Find the quiz category by ID
         const quizCategory = await QuizCategory.findById(quiz_category_id);
         if (!quizCategory) {
-            return res.status(404).json({ message: 'Quiz Category not found' });
+            return res.json({ code: 404, status: false, message: 'Quiz Category not found' });
         }
 
         // Check if the updated title already exists for another quiz
         if (title !== quizCategory.title) {
             const existingQuizCategory = await QuizCategory.findOne({ title: title });
             if (existingQuizCategory) {
-                return res.status(409).json({ message: 'Quiz Category with this title already exists' });
+                return res.json({ code: 409, status: true, message: 'Quiz Category with this title already exists' });
             }
         }
 
@@ -125,7 +127,7 @@ const updateQuizCategory = asyncHandler(async (req, res) => {
             }
         );
 
-        res.json(updatedQuizCategory);
+        res.json({ code: 200, status: true, message: '', updatedQuizCategory: updatedQuizCategory });
     } catch (err) {
         throw new Error(err);
     }
@@ -145,13 +147,14 @@ const getAllQuizzesFromQuizCategoryId = asyncHandler(async (req, res) => {
         const quizCategory = await QuizCategory.findById(quiz_category_id);
 
         if (!quizCategory) {
-            return res.status(404).json({ message: 'Quiz Category not found' });
+            return res.json({ code: 404, status: false, message: 'Quiz Category not found' });
         }
 
         // Find all quizzes for the given quiz category ID and populate the 'category' field in each quiz
         const quizzes = await Quiz.find({ category: quiz_category_id }).select('-category');
 
         res.json({
+            code: 200, status: true, message: '',
             quizCategory: quizCategory,
             quizzes: quizzes,
         });
