@@ -1,8 +1,10 @@
 //const User = require('../models/user_model');
 const Quiz = require('../models/quiz_model');
 const QuizCategory = require('../models/quiz_category_model');
+const QuizResult = require('../models/quiz_result_model');
 const asyncHandler = require('express-async-handler');
 const lodash = require('lodash');
+const { getStartOfWeek, getEndOfWeek } = require('../utils/app_utils');
 //const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 
 
@@ -25,6 +27,9 @@ const getHomeScreenDetails = asyncHandler(async (req, res) => {
 
 const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
     try {
+        const startOfWeek = getStartOfWeek();
+        const endOfWeek = getEndOfWeek();
+
         const allQuizzes = await Quiz.find().populate('category');
         const allQuizCategories = await QuizCategory.find();
         const randomTopPickQuiz = lodash.sample(allQuizzes); // Get a random top pick quiz
@@ -42,9 +47,15 @@ const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
             })
         );
 
+        const weekTopRank = await QuizResult.findOne({
+            createdAt: { $gte: startOfWeek, $lt: endOfWeek }
+        }).sort({ points: -1 })
+            .populate('user', 'firstname lastname');
+
         res.json({
             code: 200, status: true, message: '',
             top_pic_quiz: randomTopPickQuiz,
+            week_top_rank: weekTopRank,
             quiz_categories: quizCategoriesWithCounts
         });
     }
@@ -53,16 +64,35 @@ const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
     }
 });
 
-/*const getProfileDetails = asyncHandler(async (req, res) => {
-        try {
-        }
-        catch (err) {
-            throw new Error(err);
+const getLeaderboardDetails = asyncHandler(async (req, res) => {
+
+    try {
+        const startOfWeek = getStartOfWeek();
+        const endOfWeek = getEndOfWeek();
+
+        const weeklyLeaderboard = await QuizResult.find({
+            createdAt: { $gte: startOfWeek, $lt: endOfWeek }
+        }).sort({ points: -1 })
+            .populate('user', 'firstname lastname'); // Populate user details with specified fields
+        const allTimeLeaderboard = await QuizResult.find().sort({ points: -1 })
+            .populate('user', 'firstname lastname'); // Populate user details with specified fields
+
+        if (allTimeLeaderboard.length > 0) {
+            res.json({
+                code: 200, status: true, message: '',
+                all_time_leaderboard: allTimeLeaderboard,
+                weekly_leaderboard: weeklyLeaderboard
+            });
+        } else {
+            res.json({ code: 404, status: false, message: 'No data found' });
         }
     }
-);*/
+    catch (err) {
+        throw new Error(err);
+    }
+});
 
 module.exports = {
-    getHomeScreenDetails, getDiscoverScreenDetails, // getProfileDetails
+    getHomeScreenDetails, getDiscoverScreenDetails, getLeaderboardDetails
 
 };

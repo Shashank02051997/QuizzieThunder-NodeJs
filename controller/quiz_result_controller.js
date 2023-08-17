@@ -6,7 +6,7 @@ const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 const submitQuizResult = asyncHandler(async (req, res) => {
     let userId = req.user._id;
     const { points } = req.body;
-
+    let quizWon = 0;  // Initialize the quizWon variable
     try {
 
         // Check if the provided user_id is a valid ObjectId
@@ -14,12 +14,17 @@ const submitQuizResult = asyncHandler(async (req, res) => {
             return res.json({ code: 400, status: false, message: 'Invalid user_id format' });
         }
 
+        // Check if points are greater than or equal to 70
+        if (parseInt(points) >= 70) {
+            quizWon++;  // Increment quizWon if points are greater than or equal to 70
+        }
+
         // Find the quiz result by user ID
         const quizResult = await QuizResult.findOne({ user: userId });
         if (!quizResult) {
             // Create a new quiz result using the Quiz result model
             const newQuizResult = await QuizResult.create({
-                user: userId, points: points, quizPlayed: 1
+                user: userId, points: points, quizPlayed: 1, quizWon: quizWon
             });
 
             return res.json({ code: 200, status: true, message: 'Quiz Result submitted successfully', newQuizResult: newQuizResult });
@@ -30,7 +35,8 @@ const submitQuizResult = asyncHandler(async (req, res) => {
             { user: userId },
             {
                 points: quizResult.points + parseInt(points),
-                quizPlayed: quizResult.quizPlayed + 1
+                quizPlayed: quizResult.quizPlayed + 1,
+                quizWon: quizWon
             },
             {
                 new: true,

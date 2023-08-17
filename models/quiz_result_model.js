@@ -14,6 +14,10 @@ const quizResultSchema = new mongoose.Schema({
     quizPlayed: {
         type: Number,
         default: 0
+    },
+    quizWon: {
+        type: Number,
+        default: 0
     }
 
 }, { timestamps: true, versionKey: false });
