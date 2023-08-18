@@ -93,7 +93,7 @@ const getLeaderboardDetails = asyncHandler(async (req, res) => {
 const getProfileDetails = asyncHandler(async (req, res) => {
     let userId = req.user._id;
     try {
-        const userDetail = await User.findOne(userId, 'firstname lastname about').lean();
+        const userDetail = await User.findOne(userId, 'firstname lastname about profilePic').lean();
         const stats = await QuizResult.findOne({
             user: userId
         }, '-user')
