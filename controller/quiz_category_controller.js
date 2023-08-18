@@ -19,7 +19,7 @@ const createQuizCategory = asyncHandler(async (req, res) => {
             title,
         });
 
-        res.json({ code: 201, status: true, message: '', newQuizCategory: newQuizCategory }); // Return the created quiz as the response.
+        res.json({ code: 201, status: true, message: 'New Quiz has been creatd', newQuizCategory: newQuizCategory }); // Return the created quiz category as the response.
     } catch (err) {
         throw new Error(err);
     }

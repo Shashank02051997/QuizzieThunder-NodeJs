@@ -43,6 +43,10 @@ var userSchema = new mongoose.Schema({
     },
     about: {
         type: String,
+    },
+    profilePic: {
+        type: String,
+        default: 'https://example.com/default-profile-pic.jpg',
     }
 }, { timestamps: true, versionKey: false });
 

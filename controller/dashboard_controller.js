@@ -1,12 +1,10 @@
-//const User = require('../models/user_model');
+const User = require('../models/user_model');
 const Quiz = require('../models/quiz_model');
 const QuizCategory = require('../models/quiz_category_model');
 const QuizResult = require('../models/quiz_result_model');
 const asyncHandler = require('express-async-handler');
 const lodash = require('lodash');
 const { getStartOfWeek, getEndOfWeek } = require('../utils/app_utils');
-//const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
-
 
 const getHomeScreenDetails = asyncHandler(async (req, res) => {
     try {
@@ -92,7 +90,36 @@ const getLeaderboardDetails = asyncHandler(async (req, res) => {
     }
 });
 
+const getProfileDetails = asyncHandler(async (req, res) => {
+    let userId = req.user._id;
+    try {
+        const userDetail = await User.findOne(userId, 'firstname lastname').lean();
+        const stats = await QuizResult.findOne({
+            user: userId
+        }, '-user')
+        let rank = null;
+        if (stats) {
+            const userPoints = stats.points;
+            const higherRankUsers = await QuizResult.countDocuments({
+                points: { $gt: userPoints }
+            });
+            rank = higherRankUsers + 1;
+        }
+
+        res.json({
+            code: 200, status: true, message: '',
+            user_detail: userDetail,
+            // badge: {},
+            stats: stats,
+            rank: rank
+        });
+    }
+    catch (err) {
+        throw new Error(err);
+    }
+});
+
 module.exports = {
-    getHomeScreenDetails, getDiscoverScreenDetails, getLeaderboardDetails
+    getHomeScreenDetails, getDiscoverScreenDetails, getLeaderboardDetails, getProfileDetails
 
 };

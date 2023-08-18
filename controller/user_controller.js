@@ -6,56 +6,54 @@ const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
 
-const createUser = asyncHandler(
-    async (req, res) => {
-        try {
-            const email = req.body.email;
-            const findUser = await User.findOne({ email: email });
-            if (!findUser) {
-                const newUser = await User.create(req.body);
+const createUser = asyncHandler(async (req, res) => {
+    const email = req.body.email;
+    try {
+        const findUser = await User.findOne({ email: email });
+        if (!findUser) {
+            const newUser = await User.create(req.body);
 
-                const result = {
-                    firstname: newUser.firstname,
-                    lastname: newUser.lastname,
-                    email: newUser.email,
-                    mobile: newUser.mobile,
-                    _id: newUser._id,
-                    createdAt: newUser.createdAt,
-                    updatedAt: newUser.updatedAt,
-                };
+            const result = {
+                firstname: newUser.firstname,
+                lastname: newUser.lastname,
+                email: newUser.email,
+                mobile: newUser.mobile,
+                _id: newUser._id,
+                createdAt: newUser.createdAt,
+                updatedAt: newUser.updatedAt,
+            };
 
-                // Generate OTP and save it to the Otp collection
-                const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-                await Otp.create({ mobile: newUser.mobile, otp, createdAt: new Date() });
-                // Send the OTP to the user's mobile number using sms service
+            // Generate OTP and save it to the Otp collection
+            const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
+            await Otp.create({ mobile: newUser.mobile, otp, createdAt: new Date() });
+            // Send the OTP to the user's mobile number using sms service
 
-                res.json({ code: 200, status: true, message: 'User created successfully', result: result });
+            res.json({ code: 200, status: true, message: 'User created successfully', result: result });
+        }
+        else {
+            if (findUser.isMobileNumberVerified) {
+                res.json({ code: 404, status: false, message: 'User already exists' });
             }
             else {
-                if (findUser.isMobileNumberVerified) {
-                    res.json({ code: 404, status: false, message: 'User already exists' });
-                }
-                else {
-                    // User already exists, but mobile number is not verified, send OTP again
-                    const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-                    await Otp.findOneAndUpdate({ mobile: findUser.mobile }, { otp, createdAt: new Date() });
-                    // Send the OTP to the user's mobile number using sms service
+                // User already exists, but mobile number is not verified, send OTP again
+                const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
+                await Otp.findOneAndUpdate({ mobile: findUser.mobile }, { otp, createdAt: new Date() });
+                // Send the OTP to the user's mobile number using sms service
 
-                    res.json({ code: 210, status: true, message: 'OTP has been sent successfully on your given phone number' });
-                }
-                //throw new Error('User already exists');
+                res.json({ code: 210, status: true, message: 'OTP has been sent successfully on your given phone number' });
             }
-        }
-        catch (err) {
-            throw new Error(err);
+            //throw new Error('User already exists');
         }
     }
-);
+    catch (err) {
+        throw new Error(err);
+    }
+});
 
 const verifyMobileOtp = asyncHandler(async (req, res) => {
-    try {
-        const { mobile, otp } = req.body;
+    const { mobile, otp } = req.body;
 
+    try {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
@@ -119,8 +117,8 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
+    const { mobile, password } = req.body;
     try {
-        const { mobile, password } = req.body;
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
@@ -170,8 +168,8 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const adminLogin = asyncHandler(async (req, res) => {
+    const { mobile, password } = req.body;
     try {
-        const { mobile, password } = req.body;
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
@@ -357,8 +355,8 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
+    const { mobile } = req.body;
     try {
-        const { mobile } = req.body;
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
@@ -367,6 +365,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
         const user = await User.findOne({ mobile: mobile }).select('-password');
         if (user) {
+            // Generate OTP and save it to the Otp collection
+            const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
+            await Otp.create({ mobile: user.mobile, otp, createdAt: new Date() });
+            // Send the OTP to the user's mobile number using sms service
+
+
             res.json({ code: 200, status: true, message: '', user: user });
         }
         else {
@@ -377,18 +381,79 @@ const forgotPassword = asyncHandler(async (req, res) => {
     }
 });
 
-const resetPassword = asyncHandler(async (req, res, next) => {
-    try {
-        const { mobile, new_password } = req.body;
+const createNewPassword = asyncHandler(async (req, res) => {
+    const { mobile, otp, new_password } = req.body;
 
+    try {
         // Validate mobile number format (you may need to adjust this based on your mobile number format).
         const mobileRegex = /^\d{10}$/;
         if (!mobile.match(mobileRegex)) {
             return res.json({ code: 404, status: false, message: 'Invalid mobile number format' });
         }
 
-        // Find the user by mobile number.
+        // Find the user with the given mobile number
         const user = await User.findOne({ mobile: mobile });
+
+        if (!user) {
+            return res.json({ code: 404, status: false, message: 'User not found' });
+        }
+
+        // Find the OTP document for the given mobile number
+        const otpDocument = await Otp.findOne({ mobile: mobile });
+
+        if (!otpDocument) {
+            return res.json({ code: 404, status: false, message: 'OTP not found' });
+        }
+
+        // Check if the provided OTP matches the one in the database
+        if (otp === otpDocument.otp) {
+            // Check if the OTP is expired
+            const currentTime = new Date();
+            const createdAtTime = otpDocument.createdAt;
+            const otpExpirationTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+            console.log('currentTime = ' + currentTime + ' createdAtTime = ' + createdAtTime);
+
+            if (currentTime - createdAtTime > otpExpirationTime) {
+                // OTP is expired
+                return res.json({ code: 404, status: false, message: 'OTP has expired' });
+            }
+
+            // Hash the new password before updating.
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(new_password, salt);
+
+            // If the OTP is not expired, update the new password in the user document        
+            await User.findByIdAndUpdate(
+                user._id,
+                {
+                    password: hashedPassword,
+                },
+                {
+                    new: true,
+                }
+            );
+
+            // Delete the OTP document after successful verification
+            await otpDocument.deleteOne();
+
+            return res.json({ code: 200, status: true, message: 'New password created successfully. Please login' });
+        } else {
+            return res.json({ code: 404, status: false, message: 'Invalid OTP' });
+        }
+
+    } catch (err) {
+        throw new Error(err);
+    }
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+    const { _id } = req.user;
+    const { new_password } = req.body;
+    try {
+
+        // Find the user by user id.
+        const user = await User.findById(_id);
         if (!user) {
             return res.json({ code: 404, status: false, message: 'User not found' });
         }
@@ -420,5 +485,5 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 
 module.exports = {
     createUser, loginUser, verifyMobileOtp, adminLogin, getAllUsers, getSpecificUser, deleteSpecificUser,
-    updateUser, updateUserBlockStatus, logout, forgotPassword, resetPassword
+    updateUser, updateUserBlockStatus, logout, forgotPassword, createNewPassword, resetPassword
 };
