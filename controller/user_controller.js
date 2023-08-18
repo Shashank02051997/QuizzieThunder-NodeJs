@@ -447,7 +447,7 @@ const createNewPassword = asyncHandler(async (req, res) => {
     }
 });
 
-const resetPassword = asyncHandler(async (req, res, next) => {
+const updatePassword = asyncHandler(async (req, res, next) => {
     const { _id } = req.user;
     const { new_password } = req.body;
     try {
@@ -485,5 +485,5 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 
 module.exports = {
     createUser, loginUser, verifyMobileOtp, adminLogin, getAllUsers, getSpecificUser, deleteSpecificUser,
-    updateUser, updateUserBlockStatus, logout, forgotPassword, createNewPassword, resetPassword
+    updateUser, updateUserBlockStatus, logout, forgotPassword, createNewPassword, updatePassword
 };

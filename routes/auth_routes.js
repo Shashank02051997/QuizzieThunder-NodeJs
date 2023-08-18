@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createUser, loginUser, adminLogin, getAllUsers, getSpecificUser,
     deleteSpecificUser, updateUser, updateUserBlockStatus, logout,
-    forgotPassword, createNewPassword, resetPassword, verifyMobileOtp } = require('../controller/user_controller');
+    forgotPassword, createNewPassword, updatePassword, verifyMobileOtp } = require('../controller/user_controller');
 const { authMiddleware, isAdmin } = require('../middlewares/auth_middleware');
 
 router.post('/register', createUser);
@@ -18,6 +18,6 @@ router.put('/:user_id/block-status', authMiddleware, isAdmin, updateUserBlockSta
 router.get('/logout', authMiddleware, logout);
 router.post('/forgot-password', forgotPassword);
 router.put('/create-new-password', createNewPassword);
-router.put('/reset-password', authMiddleware, resetPassword);
+router.put('/update-password', authMiddleware, updatePassword);
 
 module.exports = router;
