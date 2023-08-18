@@ -2,7 +2,7 @@ const Question = require('../models/question_model');
 const Quiz = require('../models/quiz_model');
 const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 const asyncHandler = require('express-async-handler');
-
+const lodash = require('lodash');
 
 const createQuestion = asyncHandler(async (req, res) => {
 
@@ -43,11 +43,12 @@ const getAllQuestionsFromQuizId = asyncHandler(async (req, res) => {
 
         // Find all questions for the given quiz ID and populate the 'quiz' field in each question
         const questions = await Question.find({ quiz: quiz_id }).select('-quiz');
+        const randomQuestions = lodash.sampleSize(questions, 10); // Get 10 random questions
 
         res.json({
             code: 200, status: true, message: '',
             quiz: quiz,
-            questions: questions,
+            questions: randomQuestions,
         });
     } catch (err) {
         throw new Error(err);
