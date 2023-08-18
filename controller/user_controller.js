@@ -282,7 +282,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
         // If the requester is not an admin and is trying to update another user's details, return a 403 Forbidden response.
         if (role !== 'admin' && user_id !== _id.toString()) {
-            return res.json({ code: 404, status: false, message: 'You do not have permission to update this user' });
+            return res.json({ code: 403, status: false, message: 'You do not have permission to update this user' });
         }
         const updatedUser = await User.findByIdAndUpdate(
             user_id,
@@ -296,7 +296,7 @@ const updateUser = asyncHandler(async (req, res) => {
             }
         ).select('-password');
         if (updateUser) {
-            res.json({ code: 200, status: true, updatedUser: updatedUser });
+            res.json({ code: 200, status: true, message: 'Profile details has been updated succefully', updatedUser: updatedUser });
         } else {
             res.json({ code: 404, status: false, message: 'User not found' });
         }
