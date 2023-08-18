@@ -24,8 +24,9 @@ const createUser = asyncHandler(async (req, res) => {
             };
 
             // Generate OTP and save it to the Otp collection
-            const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-            await Otp.create({ mobile: newUser.mobile, otp, createdAt: new Date() });
+            const generatedOtp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
+            await Otp.findOneAndUpdate({ mobile: newUser.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
+
             // Send the OTP to the user's mobile number using sms service
 
             res.json({ code: 200, status: true, message: 'User created successfully', result: result });
@@ -365,13 +366,14 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
         const user = await User.findOne({ mobile: mobile }).select('-password');
         if (user) {
+
             // Generate OTP and save it to the Otp collection
-            const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-            await Otp.create({ mobile: user.mobile, otp, createdAt: new Date() });
+            const generatedOtp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
+            await Otp.findOneAndUpdate({ mobile: user.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
+
             // Send the OTP to the user's mobile number using sms service
 
-
-            res.json({ code: 200, status: true, message: '', user: user });
+            res.json({ code: 200, status: true, message: 'Verification code has been sent to your given mobile number' });
         }
         else {
             res.json({ code: 404, status: false, message: 'User not found' });
