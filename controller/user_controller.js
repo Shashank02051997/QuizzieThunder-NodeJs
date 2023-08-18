@@ -289,7 +289,8 @@ const updateUser = asyncHandler(async (req, res) => {
             {
                 firstname: req.body.firstname,
                 lastname: req.body.lastname,
-                about: req.body.about
+                about: req.body.about,
+                profilePic: req.body.profile_pic
             },
             {
                 new: true,

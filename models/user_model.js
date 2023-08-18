@@ -46,7 +46,7 @@ var userSchema = new mongoose.Schema({
     },
     profilePic: {
         type: String,
-        default: 'https://example.com/default-profile-pic.jpg',
+        default: 'https://res.cloudinary.com/dt6hyafmc/image/upload/v1692392344/Avatars/avatar_8609.png',
     }
 }, { timestamps: true, versionKey: false });
 
