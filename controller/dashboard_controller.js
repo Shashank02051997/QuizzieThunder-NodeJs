@@ -102,6 +102,7 @@ const getProfileDetails = asyncHandler(async (req, res) => {
         let averagePointsPerQuiz = 0;
         const totalQuizzesAvailable = await Quiz.countDocuments();
         let quizParticipationRate = 0;
+        let statsResult = null;
 
         if (stats) {
             successRate = (stats.quizWon / stats.quizPlayed) * 100;
@@ -113,13 +114,8 @@ const getProfileDetails = asyncHandler(async (req, res) => {
                 points: { $gt: userPoints }
             });
             rank = higherRankUsers + 1;
-        }
 
-        res.json({
-            code: 200, status: true, message: 'Profile details fetched successfully',
-            user_detail: userDetail,
-            // badge: {},
-            stats: {
+            statsResult = {
                 quiz_won: stats.quizWon,
                 _id: stats._id,
                 points: stats.points,
@@ -130,7 +126,14 @@ const getProfileDetails = asyncHandler(async (req, res) => {
                 quiz_participation_rate: quizParticipationRate,
                 createdAt: stats.createdAt,
                 updatedAt: stats.updatedAt
-            },
+            };
+        }
+
+        res.json({
+            code: 200, status: true, message: 'Profile details fetched successfully',
+            user_detail: userDetail,
+            // badge: {},
+            stats: statsResult,
         });
     }
     catch (err) {
