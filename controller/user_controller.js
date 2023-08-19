@@ -1,17 +1,28 @@
 const User = require('../models/user_model');
 const Otp = require('../models/otp_model');
+const Avatar = require('../models/avatar_model');
 const asyncHandler = require('express-async-handler');
 const generateToken = require('../config/jwt_token');
 const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
+const lodash = require('lodash');
 
 const createUser = asyncHandler(async (req, res) => {
     const email = req.body.email;
     try {
         const findUser = await User.findOne({ email: email });
+        const allAvatars = await Avatar.find();
+        const randomProfilePic = lodash.sample(allAvatars);
         if (!findUser) {
-            const newUser = await User.create(req.body);
+            const newUser = await User.create({
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
+                email: req.body.email,
+                mobile: req.body.mobile,
+                password: req.body.password,
+                profilePic: randomProfilePic.url
+            });
 
             const result = {
                 firstname: newUser.firstname,
@@ -19,6 +30,7 @@ const createUser = asyncHandler(async (req, res) => {
                 email: newUser.email,
                 mobile: newUser.mobile,
                 _id: newUser._id,
+                profile_picture: newUser.profilePic,
                 createdAt: newUser.createdAt,
                 updatedAt: newUser.updatedAt,
             };

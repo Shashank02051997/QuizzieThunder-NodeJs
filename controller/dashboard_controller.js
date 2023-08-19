@@ -93,12 +93,21 @@ const getLeaderboardDetails = asyncHandler(async (req, res) => {
 const getProfileDetails = asyncHandler(async (req, res) => {
     let userId = req.user._id;
     try {
-        const userDetail = await User.findOne(userId, 'firstname lastname about profilePic').lean();
+        const userDetail = await User.findOne(userId, '-password').lean();
         const stats = await QuizResult.findOne({
             user: userId
         }, '-user')
         let rank = null;
+        let successRate = 0;
+        let averagePointsPerQuiz = 0;
+        const totalQuizzesAvailable = await Quiz.countDocuments();
+        let quizParticipationRate = 0;
+
         if (stats) {
+            successRate = (stats.quizWon / stats.quizPlayed) * 100;
+            averagePointsPerQuiz = stats.points / stats.quizPlayed;
+            quizParticipationRate = (stats.quizPlayed / totalQuizzesAvailable) * 100;
+
             const userPoints = stats.points;
             const higherRankUsers = await QuizResult.countDocuments({
                 points: { $gt: userPoints }
@@ -107,11 +116,21 @@ const getProfileDetails = asyncHandler(async (req, res) => {
         }
 
         res.json({
-            code: 200, status: true, message: '',
+            code: 200, status: true, message: 'Profile details fetched successfully',
             user_detail: userDetail,
             // badge: {},
-            stats: stats,
-            rank: rank
+            stats: {
+                quiz_won: stats.quizWon,
+                _id: stats._id,
+                points: stats.points,
+                total_quiz_played: stats.quizPlayed,
+                rank: rank,
+                success_rate: successRate,
+                average_points_per_quiz: averagePointsPerQuiz,
+                quiz_participation_rate: quizParticipationRate,
+                createdAt: stats.createdAt,
+                updatedAt: stats.updatedAt
+            },
         });
     }
     catch (err) {
