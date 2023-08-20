@@ -12,11 +12,25 @@ const lodash = require('lodash');
 
 const createUser = asyncHandler(async (req, res) => {
     const email = req.body.email;
+    const mobile = req.body.mobile;
+
     try {
-        const findUser = await User.findOne({ email: email });
+        const findUserByEmail = await User.findOne({ email: email });
+        const findUserByMobile = await User.findOne({ mobile: mobile }); // New addition
+
         const allAvatars = await Avatar.find();
         const randomProfilePic = lodash.sample(allAvatars);
-        if (!findUser) {
+
+        if (findUserByEmail) {
+            return res.json({ code: 404, status: false, message: 'Email address already exists' });
+        }
+
+
+        if (findUserByMobile) {
+            return res.json({ code: 404, status: false, message: 'Mobile number already exists' });
+        }
+
+        if (!findUserByEmail && !findUserByMobile) {
             const newUser = await User.create({
                 firstname: req.body.firstname,
                 lastname: req.body.lastname,
@@ -49,15 +63,15 @@ const createUser = asyncHandler(async (req, res) => {
             res.json({ code: 200, status: true, message: 'User created successfully', result: result });
         }
         else {
-            if (findUser.isMobileNumberVerified) {
+            if (findUserByMobile.isMobileNumberVerified) {
                 res.json({ code: 404, status: false, message: 'User already exists' });
             }
             else {
                 // User already exists, but mobile number is not verified, send OTP again
                 const generatedOtp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-                await Otp.findOneAndUpdate({ mobile: findUser.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
+                await Otp.findOneAndUpdate({ mobile: findUserByMobile.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
                 // Send the OTP to the user's mobile number using sms service
-                sendSMS(`+91${findUser.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
+                sendSMS(`+91${findUserByMobile.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
                     .then(message => console.log('OTP sent:', message.sid))
                     .catch(error => console.error('Error sending OTP:', error));
 
