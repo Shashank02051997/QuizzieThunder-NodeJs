@@ -4,7 +4,6 @@ const QuizCategory = require('../models/quiz_category_model');
 const QuizResult = require('../models/quiz_result_model');
 const asyncHandler = require('express-async-handler');
 const lodash = require('lodash');
-const { getStartOfWeek, getEndOfWeek } = require('../utils/app_utils');
 
 const getHomeScreenDetails = asyncHandler(async (req, res) => {
     try {
@@ -25,8 +24,9 @@ const getHomeScreenDetails = asyncHandler(async (req, res) => {
 
 const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
     try {
-        const startOfWeek = getStartOfWeek();
-        const endOfWeek = getEndOfWeek();
+
+        const currentDate = new Date();
+        const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
 
         const allQuizzes = await Quiz.find().populate('category');
         const allQuizCategories = await QuizCategory.find();
@@ -46,7 +46,7 @@ const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
         );
 
         const weekTopRank = await QuizResult.findOne({
-            createdAt: { $gte: startOfWeek, $lt: endOfWeek }
+            createdAt: { $gte: oneWeekAgo, $lt: currentDate }
         }).sort({ points: -1 })
             .populate('user', 'firstname lastname profilePic');
 
@@ -65,11 +65,11 @@ const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
 const getLeaderboardDetails = asyncHandler(async (req, res) => {
 
     try {
-        const startOfWeek = getStartOfWeek();
-        const endOfWeek = getEndOfWeek();
+        const currentDate = new Date();
+        const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
 
         const weeklyLeaderboard = await QuizResult.find({
-            createdAt: { $gte: startOfWeek, $lt: endOfWeek }
+            createdAt: { $gte: oneWeekAgo, $lt: currentDate }
         }).sort({ points: -1 })
             .populate('user', 'firstname lastname profilePic'); // Populate user details with specified fields
         const allTimeLeaderboard = await QuizResult.find().sort({ points: -1 })
