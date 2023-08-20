@@ -46,7 +46,7 @@ const getDiscoverScreenDetails = asyncHandler(async (req, res) => {
         );
 
         const weekTopRank = await QuizResult.findOne({
-            createdAt: { $gte: oneWeekAgo, $lt: currentDate }
+            updatedAt: { $gte: oneWeekAgo, $lt: currentDate }
         }).sort({ points: -1 })
             .populate('user', 'firstname lastname profilePic');
 
@@ -69,7 +69,7 @@ const getLeaderboardDetails = asyncHandler(async (req, res) => {
         const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
 
         const weeklyLeaderboard = await QuizResult.find({
-            createdAt: { $gte: oneWeekAgo, $lt: currentDate }
+            updatedAt: { $gte: oneWeekAgo, $lt: currentDate }
         }).sort({ points: -1 })
             .populate('user', 'firstname lastname profilePic'); // Populate user details with specified fields
         const allTimeLeaderboard = await QuizResult.find().sort({ points: -1 })
