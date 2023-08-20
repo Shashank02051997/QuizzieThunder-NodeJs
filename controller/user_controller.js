@@ -4,9 +4,11 @@ const Avatar = require('../models/avatar_model');
 const asyncHandler = require('express-async-handler');
 const generateToken = require('../config/jwt_token');
 const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
+const { sendSMS } = require("../utils/send_sms");
 const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
 const lodash = require('lodash');
+
 
 const createUser = asyncHandler(async (req, res) => {
     const email = req.body.email;
@@ -40,6 +42,9 @@ const createUser = asyncHandler(async (req, res) => {
             await Otp.findOneAndUpdate({ mobile: newUser.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
 
             // Send the OTP to the user's mobile number using sms service
+            sendSMS(`+91${newUser.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
+                .then(message => console.log('OTP sent:', message.sid))
+                .catch(error => console.error('Error sending OTP:', error));
 
             res.json({ code: 200, status: true, message: 'User created successfully', result: result });
         }
@@ -49,9 +54,12 @@ const createUser = asyncHandler(async (req, res) => {
             }
             else {
                 // User already exists, but mobile number is not verified, send OTP again
-                const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-                await Otp.findOneAndUpdate({ mobile: findUser.mobile }, { otp, createdAt: new Date() });
+                const generatedOtp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
+                await Otp.findOneAndUpdate({ mobile: findUser.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
                 // Send the OTP to the user's mobile number using sms service
+                sendSMS(`+91${findUser.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
+                    .then(message => console.log('OTP sent:', message.sid))
+                    .catch(error => console.error('Error sending OTP:', error));
 
                 res.json({ code: 210, status: true, message: 'OTP has been sent successfully on your given phone number' });
             }
@@ -149,6 +157,9 @@ const loginUser = asyncHandler(async (req, res) => {
                     await Otp.findOneAndUpdate({ mobile: mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
 
                     // Send the generatedOtp to the user's mobile number using sms service
+                    sendSMS(`+91${mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
+                        .then(message => console.log('OTP sent:', message.sid))
+                        .catch(error => console.error('Error sending OTP:', error));
 
                     return res.json({ code: 210, status: true, message: 'OTP has been sent successfully on your given phone number' });
                 }
@@ -387,6 +398,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
             await Otp.findOneAndUpdate({ mobile: user.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
 
             // Send the OTP to the user's mobile number using sms service
+            sendSMS(`+91${user.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
+                .then(message => console.log('OTP sent:', message.sid))
+                .catch(error => console.error('Error sending OTP:', error));
 
             res.json({ code: 200, status: true, message: 'Verification code has been sent to your given mobile number' });
         }
