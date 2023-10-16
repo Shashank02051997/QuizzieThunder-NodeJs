@@ -27,7 +27,7 @@ const createUser = asyncHandler(async (req, res) => {
 
 
         if (findUserByMobile) {
-            return res.json({ code: 404, status: false, message: 'Mobile number already exists' });
+            return res.json({ code: 404, status: false, message: 'Mobile number already exists. Please try to login' });
         }
 
         if (!findUserByEmail && !findUserByMobile) {
@@ -61,23 +61,6 @@ const createUser = asyncHandler(async (req, res) => {
                 .catch(error => console.error('Error sending OTP:', error));
 
             res.json({ code: 200, status: true, message: 'User created successfully', result: result });
-        }
-        else {
-            if (findUserByMobile.isMobileNumberVerified) {
-                res.json({ code: 404, status: false, message: 'User already exists' });
-            }
-            else {
-                // User already exists, but mobile number is not verified, send OTP again
-                const generatedOtp = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false, digits: true });
-                await Otp.findOneAndUpdate({ mobile: findUserByMobile.mobile }, { otp: generatedOtp, createdAt: new Date() }, { upsert: true });
-                // Send the OTP to the user's mobile number using sms service
-                sendSMS(`+91${findUserByMobile.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
-                    .then(message => console.log('OTP sent:', message.sid))
-                    .catch(error => console.error('Error sending OTP:', error));
-
-                res.json({ code: 210, status: true, message: 'OTP has been sent successfully on your given phone number' });
-            }
-            //throw new Error('User already exists');
         }
     }
     catch (err) {

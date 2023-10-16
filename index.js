@@ -14,11 +14,15 @@ const quizResultRouter = require('./routes/quiz_result_routes');
 const avatarRouter = require('./routes/avatar_routes');
 const { notFound, errorHandler } = require('./middlewares/error_handler');
 const morgan = require('morgan');
+const cors = require("cors");
+
 dbConnect();
 
+app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
 
 app.use('/api/user', authRouter);
 app.use('/api/quiz/category', quizCategoryRouter);

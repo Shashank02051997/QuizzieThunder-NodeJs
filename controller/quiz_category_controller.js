@@ -8,18 +8,18 @@ const createQuizCategory = asyncHandler(async (req, res) => {
     const { title } = req.body;
 
     try {
-        // Check if a quiz with the same title already exists
+        // Check if a quiz category with the same title already exists
         const existingQuizCategory = await QuizCategory.findOne({ title: title });
         if (existingQuizCategory) {
             return res.json({ code: 401, status: false, message: 'Quiz Category with this title already exists' });
         }
 
-        // Create a new quiz using the Quiz model
+        // Create a new quiz category using the Quiz category model
         const newQuizCategory = await QuizCategory.create({
             title,
         });
 
-        res.json({ code: 201, status: true, message: 'New Quiz has been creatd', newQuizCategory: newQuizCategory }); // Return the created quiz category as the response.
+        res.json({ code: 201, status: true, message: 'New Quiz category has been creatd', newQuizCategory: newQuizCategory }); // Return the created quiz category as the response.
     } catch (err) {
         throw new Error(err);
     }
