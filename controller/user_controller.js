@@ -46,7 +46,7 @@ const createUser = asyncHandler(async (req, res) => {
                 email: newUser.email,
                 mobile: newUser.mobile,
                 _id: newUser._id,
-                profile_picture: newUser.profilePic,
+                profile_pic: newUser.profilePic,
                 createdAt: newUser.createdAt,
                 updatedAt: newUser.updatedAt,
             };
@@ -210,6 +210,7 @@ const adminLogin = asyncHandler(async (req, res) => {
                         lastname: user.lastname,
                         email: user.email,
                         mobile: user.mobile,
+                        profile_pic: user.profilePic,
                         token: generateToken(user._id),
                     };
                     res.json({
@@ -231,9 +232,13 @@ const adminLogin = asyncHandler(async (req, res) => {
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
+    const isAdmin = req.query.isAdmin === 'true' || false;
     try {
-        const allUsers = await User.find();
-        const userCount = await User.countDocuments();
+        let allUsers = await User.find({ role: 'user' });
+        if (isAdmin) {
+            allUsers = await User.find({ role: 'admin' });
+        }
+        const userCount = allUsers.length;
         if (allUsers.length > 0) {
             res.json({
                 code: 200, status: true,
@@ -306,14 +311,35 @@ const updateUser = asyncHandler(async (req, res) => {
         if (role !== 'admin' && user_id !== _id.toString()) {
             return res.json({ code: 403, status: false, message: 'You do not have permission to update this user' });
         }
+        const updateFields = {
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            about: req.body.about,
+            profilePic: req.body.profile_pic,
+        };
+
+        // If the requester is an admin, allow them to update additional fields
+        if (role === 'admin') {
+            if (req.body.email) {
+                updateFields.email = req.body.email;
+            }
+            if (req.body.mobile) {
+                updateFields.mobile = req.body.mobile;
+            }
+            if (req.body.isMobileNumberVerified) {
+                updateFields.isMobileNumberVerified = req.body.isMobileNumberVerified;
+            }
+            if (req.body.isEmailVerified) {
+                updateFields.isEmailVerified = req.body.isEmailVerified;
+            }
+            if (req.body.isBlocked) {
+                updateFields.isBlocked = req.body.isBlocked;
+            }
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             user_id,
-            {
-                firstname: req.body.firstname,
-                lastname: req.body.lastname,
-                about: req.body.about,
-                profilePic: req.body.profile_pic
-            },
+            updateFields,
             {
                 new: true,
             }
