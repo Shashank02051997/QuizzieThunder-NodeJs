@@ -57,7 +57,7 @@ const getSpecificQuizCategory = asyncHandler(async (req, res) => {
 
         const quizCategory = await QuizCategory.findById(quiz_category_id);
         if (quizCategory) {
-            res.json({ code: 200, status: true, message: '', quizCategory: quizCategory });
+            res.json({ code: 200, status: true, message: 'New Quiz category added successfully', quizCategory: quizCategory });
         } else {
             res.json({ code: 404, status: false, message: 'Quiz Category not found' });
         }

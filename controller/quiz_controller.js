@@ -21,7 +21,7 @@ const createQuiz = asyncHandler(async (req, res) => {
         // Create a new quiz using the Quiz model
         const newQuiz = await Quiz.create(req.body);
 
-        res.json({ code: 200, status: true, newQuiz: newQuiz }); // Return the created quiz as the response.
+        res.json({ code: 200, status: true, message: 'New Quiz added successfully', newQuiz: newQuiz }); // Return the created quiz as the response.
     } catch (err) {
         throw new Error(err);
     }
@@ -57,7 +57,7 @@ const getSpecificQuiz = asyncHandler(async (req, res) => {
             return res.json({ code: 400, status: false, message: 'Invalid quiz_id format' });
         }
 
-        const quiz = await Quiz.findById(quiz_id);
+        const quiz = await Quiz.findById(quiz_id).populate('category');
         if (quiz) {
             res.json({ code: 200, status: true, quiz: quiz });
         } else {
