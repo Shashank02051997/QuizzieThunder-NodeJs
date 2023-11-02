@@ -127,7 +127,7 @@ const updateQuizCategory = asyncHandler(async (req, res) => {
             }
         );
 
-        res.json({ code: 200, status: true, message: '', updatedQuizCategory: updatedQuizCategory });
+        res.json({ code: 200, status: true, message: 'Quiz category details has been updated succefully', updatedQuizCategory: updatedQuizCategory });
     } catch (err) {
         throw new Error(err);
     }

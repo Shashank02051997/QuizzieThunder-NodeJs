@@ -326,15 +326,9 @@ const updateUser = asyncHandler(async (req, res) => {
             if (req.body.mobile) {
                 updateFields.mobile = req.body.mobile;
             }
-            if (req.body.isMobileNumberVerified) {
-                updateFields.isMobileNumberVerified = req.body.isMobileNumberVerified;
-            }
-            if (req.body.isEmailVerified) {
-                updateFields.isEmailVerified = req.body.isEmailVerified;
-            }
-            if (req.body.isBlocked) {
-                updateFields.isBlocked = req.body.isBlocked;
-            }
+            updateFields.isMobileNumberVerified = req.body.isMobileNumberVerified;
+            updateFields.isEmailVerified = req.body.isEmailVerified;
+            updateFields.isBlocked = req.body.isBlocked;
         }
 
         const updatedUser = await User.findByIdAndUpdate(
