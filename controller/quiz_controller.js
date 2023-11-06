@@ -94,7 +94,7 @@ const deleteSpecificQuiz = asyncHandler(async (req, res) => {
 
 const updateQuiz = asyncHandler(async (req, res) => {
     const { quiz_id } = req.params;
-    const { title, description } = req.body;
+    const { title } = req.body;
 
     try {
 
@@ -120,16 +120,13 @@ const updateQuiz = asyncHandler(async (req, res) => {
         // Update the quiz fields
         const updatedQuiz = await Quiz.findByIdAndUpdate(
             quiz_id,
-            {
-                title: title,
-                description: description,
-            },
+            req.body,
             {
                 new: true,
             }
         );
 
-        res.json({ code: 200, status: true, updatedQuiz: updatedQuiz });
+        res.json({ code: 200, status: true, message: 'Quiz details has been updated succefully',updatedQuiz: updatedQuiz });
     } catch (err) {
         throw new Error(err);
     }
