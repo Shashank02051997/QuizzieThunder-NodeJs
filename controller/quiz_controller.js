@@ -21,7 +21,7 @@ const createQuiz = asyncHandler(async (req, res) => {
         // Create a new quiz using the Quiz model
         const newQuiz = await Quiz.create(req.body);
 
-        res.json({ code: 200, status: true, message: 'New Quiz added successfully', newQuiz: newQuiz }); // Return the created quiz as the response.
+        res.json({ code: 200, status: true, message: 'New Quiz has been added successfully', newQuiz: newQuiz }); // Return the created quiz as the response.
     } catch (err) {
         throw new Error(err);
     }
@@ -126,7 +126,7 @@ const updateQuiz = asyncHandler(async (req, res) => {
             }
         );
 
-        res.json({ code: 200, status: true, message: 'Quiz details has been updated succefully',updatedQuiz: updatedQuiz });
+        res.json({ code: 200, status: true, message: 'Quiz details has been updated succefully', updatedQuiz: updatedQuiz });
     } catch (err) {
         throw new Error(err);
     }

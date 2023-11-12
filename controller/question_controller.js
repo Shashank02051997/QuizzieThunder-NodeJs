@@ -17,7 +17,7 @@ const createQuestion = asyncHandler(async (req, res) => {
         // Create a new question using the Question model
         const newQuestion = await Question.create(req.body);
 
-        res.json({ code: 200, status: true, message: '', newQuestion: newQuestion }); // Return the created question as the response.
+        res.json({ code: 200, status: true, message: 'New Question has been added successfully', newQuestion: newQuestion }); // Return the created question as the response.
     } catch (err) {
         throw new Error(err);
     }
@@ -62,10 +62,10 @@ const getSpecificQuestion = asyncHandler(async (req, res) => {
 
         // Check if the provided question_id is a valid ObjectId
         if (!validateMongoDbId(question_id)) {
-            return res.json({ code: 400, status: false, message: 'Invalid question_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid question id format' });
         }
 
-        const question = await Question.findById(question_id);
+        const question = await Question.findById(question_id).populate('quiz');
         if (question) {
             res.json({ code: 200, status: true, message: '', question: question });
         } else {
@@ -102,7 +102,6 @@ const deleteSpecificQuestion = asyncHandler(async (req, res) => {
 const updateQuestion = asyncHandler(async (req, res) => {
     const { question_id } = req.params;
     const { question, options, correctOptionIndex } = req.body;
-
     try {
         // Check if the provided question_id is a valid ObjectId
         if (!validateMongoDbId(question_id)) {
@@ -128,7 +127,7 @@ const updateQuestion = asyncHandler(async (req, res) => {
             }
         );
 
-        res.json({ code: 200, status: true, updatedQuestion: updatedQuestion });
+        res.json({ code: 200, status: true, message: 'Question details has been updated succefully', updatedQuestion: updatedQuestion });
     } catch (err) {
         throw new Error(err);
     }
