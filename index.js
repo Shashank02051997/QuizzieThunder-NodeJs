@@ -16,6 +16,10 @@ const { notFound, errorHandler } = require('./middlewares/error_handler');
 const morgan = require('morgan');
 const cors = require("cors");
 
+const HOST = process.env.APP_HOST || 'localhost';
+
+const URL = `http://${HOST}:${process.env.PORT}` || `http://localhost:${process.env.PORT}`;
+
 dbConnect();
 
 app.use(cors());
@@ -35,7 +39,9 @@ app.use('/api/avatar', avatarRouter);
 app.use(notFound);
 app.use(errorHandler);
 
+
+
 app.listen(PORT, () => {
-    console.log('Server is running at PORT http://localhost:' + PORT);
+    console.log(`Server is running at ${URL}`);
 });
 
