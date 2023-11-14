@@ -16,7 +16,7 @@ const createUser = asyncHandler(async (req, res) => {
 
     try {
         const findUserByEmail = await User.findOne({ email: email });
-        const findUserByMobile = await User.findOne({ mobile: mobile }); // New addition
+        const findUserByMobile = await User.findOne({ mobile: mobile });
 
         const allAvatars = await Avatar.find();
         const randomProfilePic = lodash.sample(allAvatars);

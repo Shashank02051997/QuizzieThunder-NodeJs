@@ -1,4 +1,5 @@
 const Quiz = require('../models/quiz_model');
+const Question = require('../models/question_model');
 const asyncHandler = require('express-async-handler');
 const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 
@@ -30,13 +31,19 @@ const createQuiz = asyncHandler(async (req, res) => {
 
 const getAllQuiz = asyncHandler(async (req, res) => {
     try {
-        const allQuizzes = await Quiz.find().populate('category');
+        const allQuizzes = await Quiz.find();
         const quizCount = await Quiz.countDocuments();
         if (allQuizzes.length > 0) {
+            const quizzesWithQuestionCount = await Promise.all(
+                allQuizzes.map(async (quiz) => {
+                    const questionCount = await Question.countDocuments({ quiz: quiz._id });
+                    return { ...quiz.toObject(), questionCount };
+                })
+            );
             res.json({
                 code: 200, status: true,
                 count: quizCount,
-                quizzes: allQuizzes,
+                quizzes: quizzesWithQuestionCount,
             });
         } else {
             res.json({ code: 404, status: false, message: 'No quizzes found' });
