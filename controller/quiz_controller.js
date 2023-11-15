@@ -31,7 +31,7 @@ const createQuiz = asyncHandler(async (req, res) => {
 
 const getAllQuiz = asyncHandler(async (req, res) => {
     try {
-        const allQuizzes = await Quiz.find();
+        const allQuizzes = await Quiz.find().populate('category');
         const quizCount = await Quiz.countDocuments();
         if (allQuizzes.length > 0) {
             const quizzesWithQuestionCount = await Promise.all(
