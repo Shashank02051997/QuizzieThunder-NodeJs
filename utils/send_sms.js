@@ -8,7 +8,7 @@ const sendSMS = (toNumber, messageBody) => {
 
     return client.messages.create({
         body: messageBody,
-        from: "+17622383002",
+        from: "+13343669616",
         to: toNumber
     });
 };

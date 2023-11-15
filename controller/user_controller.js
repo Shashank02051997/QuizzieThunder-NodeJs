@@ -104,8 +104,6 @@ const verifyMobileOtp = asyncHandler(async (req, res) => {
             const createdAtTime = otpDocument.createdAt;
             const otpExpirationTime = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-            console.log('currentTime = ' + currentTime + ' createdAtTime = ' + createdAtTime);
-
             if (currentTime - createdAtTime > otpExpirationTime) {
                 // OTP is expired
                 return res.json({ code: 404, status: false, message: 'OTP has expired' });
