@@ -14,6 +14,16 @@ const createQuestion = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: 'Invalid quiz id format' });
         }
 
+        // Check if a question with the same content already exists for the given quiz
+        const existingQuestion = await Question.findOne({
+            quiz: quiz_id,
+            question: req.body.question,
+        });
+
+        if (existingQuestion) {
+            return res.status(400).json({ message: 'This question already exists for the quiz' });
+        }
+
         // Create a new question using the Question model
         const newQuestion = await Question.create(req.body);
 
@@ -112,6 +122,17 @@ const updateQuestion = asyncHandler(async (req, res) => {
         const existingQuestion = await Question.findById(question_id);
         if (!existingQuestion) {
             return res.json({ code: 404, status: false, message: 'Question not found' });
+        }
+
+        // Check if there is another question with the same content for the same quiz
+        const duplicateQuestion = await Question.findOne({
+            _id: { $ne: question_id }, // Exclude the current question being updated
+            quiz: existingQuestion.quiz,
+            question: question,
+        });
+
+        if (duplicateQuestion) {
+            return res.status(400).json({ message: 'Another question with the same content already exists for the quiz' });
         }
 
         // Update the question fields
