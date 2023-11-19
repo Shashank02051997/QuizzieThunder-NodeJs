@@ -27,8 +27,14 @@ const createQuizCategory = asyncHandler(async (req, res) => {
 
 
 const getAllQuizCategories = asyncHandler(async (req, res) => {
+    const search = req.query.search;
     try {
-        const allQuizCategories = await QuizCategory.find();
+        let query = {};
+
+        if (search) {
+            query = { title: { $regex: search, $options: 'i' } }; // Case-insensitive title search
+        }
+        const allQuizCategories = await QuizCategory.find(query);
         const quizCategoryCount = await QuizCategory.countDocuments();
         if (allQuizCategories.length > 0) {
             res.json({

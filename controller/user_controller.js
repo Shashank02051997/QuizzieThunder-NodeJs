@@ -231,11 +231,20 @@ const adminLogin = asyncHandler(async (req, res) => {
 
 const getAllUsers = asyncHandler(async (req, res) => {
     const isAdmin = req.query.isAdmin === 'true' || false;
+    const search = req.query.search;
+
     try {
-        let allUsers = await User.find({ role: 'user' });
-        if (isAdmin) {
-            allUsers = await User.find({ role: 'admin' });
+        let query = { role: isAdmin ? 'admin' : 'user' };
+
+        if (search) {
+            query.$or = [
+                { firstname: { $regex: search, $options: 'i' } },  // Case-insensitive firstname search
+                { email: { $regex: search, $options: 'i' } },      // Case-insensitive email search
+                { mobile: { $regex: search, $options: 'i' } },     // Case-insensitive mobile search
+            ];
         }
+
+        const allUsers = await User.find(query);
         const userCount = allUsers.length;
         if (allUsers.length > 0) {
             res.json({

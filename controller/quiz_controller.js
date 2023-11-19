@@ -30,9 +30,19 @@ const createQuiz = asyncHandler(async (req, res) => {
 
 
 const getAllQuiz = asyncHandler(async (req, res) => {
+    const { search, category } = req.query;
     try {
-        const allQuizzes = await Quiz.find().populate('category');
-        const quizCount = await Quiz.countDocuments();
+        let query = {};
+
+        if (search) {
+            query.title = { $regex: search, $options: 'i' }; // Case-insensitive title search
+        }
+
+        if (category) {
+            query.category = category; // Assuming category is the ID of the QuizCategory
+        }
+        const allQuizzes = await Quiz.find(query).populate('category');
+        const quizCount = await Quiz.countDocuments(query);
         if (allQuizzes.length > 0) {
             const quizzesWithQuestionCount = await Promise.all(
                 allQuizzes.map(async (quiz) => {
