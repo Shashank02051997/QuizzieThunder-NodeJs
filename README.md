@@ -117,6 +117,7 @@ Have any questions, or doubts or want to present your opinions or views? You're 
 ## Links
 
 - [Link to React GitHub repository](https://github.com/Shashank02051997/QuizzieThunder-ReactJs)
+- [Link to Flutter GitHub repository](https://github.com/Shashank02051997/QuizzieThunder-Flutter)
 
 ## License
 
