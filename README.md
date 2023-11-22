@@ -1,7 +1,7 @@
-# Quizze Thunder
+# Quizzie Thunder
 ![app_logo]()
 
-![QuizzeThunder](https://github.com/Shashank02051997/QuizzieThunder-NodeJs/assets/20399094/c2e63cee-89d6-46e6-869f-3b29abe9bd63 'Quizze Thunder Logo')
+![QuizzieThunder](https://github.com/Shashank02051997/QuizzieThunder-NodeJs/assets/20399094/c2e63cee-89d6-46e6-869f-3b29abe9bd63 'Quizzie Thunder Logo')
 
 ## Description
 
@@ -42,7 +42,7 @@ The MONGODB_URL is the connection string to your MongoDB database. The JWT_SECRE
 
 ## Features
 
-Quizze Thunder provides a range of features:
+Quizzie Thunder provides a range of features:
 
 🔐 User Authentication:
 
@@ -82,7 +82,7 @@ Quizze Thunder provides a range of features:
 
 ## Technologies Used
 
-Quizze Thunder is built using a variety of technologies including:
+Quizzie Thunder is built using a variety of technologies including:
 
 - [Node.js](https://nodejs.org/en)
 - [Express](https://expressjs.com/)
