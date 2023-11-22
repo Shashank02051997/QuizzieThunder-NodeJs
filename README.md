@@ -1,7 +1,5 @@
 # Quizzie Thunder
-![app_logo]()
-
-![QuizzieThunder](https://github.com/Shashank02051997/QuizzieThunder-NodeJs/assets/20399094/c2e63cee-89d6-46e6-869f-3b29abe9bd63 'Quizzie Thunder Logo')
+<img width="100" height = "100" alt="Quizzie Thunder Logo" src="https://github.com/Shashank02051997/QuizzieThunder-NodeJs/assets/20399094/c2e63cee-89d6-46e6-869f-3b29abe9bd63">
 
 ## Description
 
@@ -65,7 +63,7 @@ Quizzie Thunder provides a range of features:
 - Rich Question Database: Enjoy a diverse set of questions within each category, making every quiz unique.
 
 
-## Screenshots
+## React App Screenshots
 
 <img width="1440" alt="Screenshot 2023-11-21 at 1 30 45 AM" src="https://github.com/Shashank02051997/QuizzieThunder-NodeJs/assets/20399094/598e1dd2-c878-403b-8c50-cf9f26f53067">
 <img width="1440" alt="Screenshot 2023-11-21 at 1 29 33 AM" src="https://github.com/Shashank02051997/QuizzieThunder-NodeJs/assets/20399094/0b10c8be-1df8-404b-9ac5-0f80993a4be4">
