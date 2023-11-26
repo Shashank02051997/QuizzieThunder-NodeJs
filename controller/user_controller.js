@@ -5,6 +5,7 @@ const asyncHandler = require('express-async-handler');
 const generateToken = require('../config/jwt_token');
 const { validateMongoDbId } = require("../utils/validate_mongo_db_id");
 const { sendSMS } = require("../utils/send_sms");
+const { sendWelcomeMail } = require("../utils/send_mail");
 const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
 const lodash = require('lodash');
@@ -59,6 +60,9 @@ const createUser = asyncHandler(async (req, res) => {
             sendSMS(`+91${newUser.mobile}`, `Your Quizze Thunder OTP code is: ${generatedOtp}`)
                 .then(message => console.log('OTP sent:', message.sid))
                 .catch(error => console.error('Error sending OTP:', error));
+
+            // Send welcome mail to new user
+            sendWelcomeMail(newUser.email, newUser.firstname);
 
             res.json({ code: 200, status: true, message: 'User created successfully', result: result });
         }

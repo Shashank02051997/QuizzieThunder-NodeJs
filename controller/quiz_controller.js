@@ -56,7 +56,7 @@ const getAllQuiz = asyncHandler(async (req, res) => {
                 quizzes: quizzesWithQuestionCount,
             });
         } else {
-            res.json({ code: 404, status: false, message: 'No quizzes found' });
+            res.json({ code: 404, status: false, message: 'No quiz found' });
         }
     }
     catch (err) {
@@ -117,7 +117,7 @@ const updateQuiz = asyncHandler(async (req, res) => {
 
         // Check if the provided quiz_id is a valid ObjectId
         if (!validateMongoDbId(quiz_id)) {
-            return res.json({ code: 400, status: false, message: 'Invalid quiz_id format' });
+            return res.json({ code: 400, status: false, message: 'Invalid quiz id format' });
         }
 
         // Find the quiz by ID
@@ -149,7 +149,38 @@ const updateQuiz = asyncHandler(async (req, res) => {
     }
 });
 
+const getAllQuizFromQuizCatId = asyncHandler(async (req, res) => {
+    const { quiz_category_id } = req.params;
+    try {
+        // Check if the provided quiz_category_id is a valid ObjectId
+        if (!validateMongoDbId(quiz_category_id)) {
+            return res.json({ code: 400, status: false, message: 'Invalid quiz category id format' });
+        }
+        // Find the quiz by Quiz Category ID
+        const allQuizzes = await Quiz.find({ category: quiz_category_id }).populate('category');
+        const quizCount = await Quiz.countDocuments({ category: quiz_category_id });
+        if (allQuizzes.length > 0) {
+            const quizzesWithQuestionCount = await Promise.all(
+                allQuizzes.map(async (quiz) => {
+                    const questionCount = await Question.countDocuments({ quiz: quiz._id });
+                    return { ...quiz.toObject(), questionCount };
+                })
+            );
+            res.json({
+                code: 200, status: true,
+                count: quizCount,
+                quizzes: quizzesWithQuestionCount,
+            });
+        } else {
+            res.json({ code: 404, status: false, message: 'No quiz found' });
+        }
+
+    } catch (err) {
+        throw new Error(err);
+    }
+});
+
 module.exports = {
     createQuiz, getAllQuiz, getSpecificQuiz, deleteSpecificQuiz,
-    updateQuiz
+    updateQuiz, getAllQuizFromQuizCatId
 };
