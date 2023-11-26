@@ -85,7 +85,6 @@ Quizzie Thunder is built using a variety of technologies including:
 - [Node.js](https://nodejs.org/en)
 - [Express](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/)
-- [GraphQL](https://graphql.org/)
 - [JWT](https://jwt.io/)
 
 ## Contributing
