@@ -76,7 +76,7 @@ const getSpecificQuiz = asyncHandler(async (req, res) => {
 
         const quiz = await Quiz.findById(quiz_id).populate('category');
         if (quiz) {
-            res.json({ code: 200, status: true, quiz: quiz });
+            res.json({ code: 200, status: true, message: '', quiz: quiz });
         } else {
             res.json({ code: 404, status: false, message: 'Quiz not found' });
         }

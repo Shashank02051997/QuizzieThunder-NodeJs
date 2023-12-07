@@ -15,6 +15,7 @@ const avatarRouter = require('./routes/avatar_routes');
 const { notFound, errorHandler } = require('./middlewares/error_handler');
 const morgan = require('morgan');
 const cors = require("cors");
+const helmet = require('helmet');
 
 const HOST = process.env.APP_HOST || 'localhost';
 
@@ -27,13 +28,21 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// This disables the Content-Security-Policy
+// and X-Download-Options headers.
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    xDownloadOptions: false,
+  })
+);
 
 app.use('/api/user', authRouter);
 app.use('/api/quiz/category', quizCategoryRouter);
 app.use('/api/quiz', quizRouter);
 app.use('/api/question', questionRouter);
 app.use('/api', dashboardRouter);
-app.use('/api', quizResultRouter);
+app.use('/api/quiz/result', quizResultRouter);
 app.use('/api/avatar', avatarRouter);
 
 app.use(notFound);
@@ -42,6 +51,6 @@ app.use(errorHandler);
 
 
 app.listen(PORT, () => {
-    console.log(`Server is running at ${URL}`);
+  console.log(`Server is running at ${URL}`);
 });
 

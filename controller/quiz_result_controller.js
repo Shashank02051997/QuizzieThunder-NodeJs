@@ -49,6 +49,53 @@ const submitQuizResult = asyncHandler(async (req, res) => {
     }
 });
 
+const getAllQuizResults = asyncHandler(async (req, res) => {
+    const search = req.query.search;
+    try {
+        //let query = {};
+
+        if (search) {
+            //query = { title: { $regex: search, $options: 'i' } }; // Case-insensitive title search
+        }
+        const allQuizResults = await QuizResult.find().populate('user');
+        const quizResultCount = await QuizResult.countDocuments();
+        if (allQuizResults.length > 0) {
+            res.json({
+                code: 200, status: true, message: '',
+                count: quizResultCount,
+                quiz_results: allQuizResults,
+            });
+        } else {
+            res.json({ code: 404, status: false, message: 'No quiz result found' });
+        }
+    }
+    catch (err) {
+        throw new Error(err);
+    }
+});
+
+const getSpecificQuizResult = asyncHandler(async (req, res) => {
+    const { quiz_result_id } = req.params;
+
+    try {
+
+        // Check if the provided quiz_result_id is a valid ObjectId
+        if (!validateMongoDbId(quiz_result_id)) {
+            return res.json({ code: 400, status: false, message: 'Invalid quiz result id format' });
+        }
+
+        const quizResult = await QuizResult.findById(quiz_result_id).populate('user');
+        if (quizResult) {
+            res.json({ code: 200, status: true, message: '', quizResult: quizResult });
+        } else {
+            res.json({ code: 404, status: false, message: 'Quiz Result not found' });
+        }
+    } catch (err) {
+        throw new Error(err);
+    }
+});
+
+
 module.exports = {
-    submitQuizResult
+    submitQuizResult, getAllQuizResults, getSpecificQuizResult
 };

@@ -19,7 +19,7 @@ const createQuizCategory = asyncHandler(async (req, res) => {
             title,
         });
 
-        res.json({ code: 201, status: true, message: 'New Quiz category has been creatd', newQuizCategory: newQuizCategory }); // Return the created quiz category as the response.
+        res.json({ code: 201, status: true, message: 'New Quiz category has been created', newQuizCategory: newQuizCategory }); // Return the created quiz category as the response.
     } catch (err) {
         throw new Error(err);
     }
@@ -63,7 +63,7 @@ const getSpecificQuizCategory = asyncHandler(async (req, res) => {
 
         const quizCategory = await QuizCategory.findById(quiz_category_id);
         if (quizCategory) {
-            res.json({ code: 200, status: true, message: 'New Quiz category added successfully', quizCategory: quizCategory });
+            res.json({ code: 200, status: true, message: '', quizCategory: quizCategory });
         } else {
             res.json({ code: 404, status: false, message: 'Quiz Category not found' });
         }
