@@ -31,9 +31,10 @@ MONGODB_URL
 JWT_SECRET
 TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN
+SENDGRID_API_KEY
 ```
 
-The MONGODB_URL is the connection string to your MongoDB database. The JWT_SECRET can be any string of your choice. Additionally, include the TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN for Twilio integration.
+The MONGODB_URL is the connection string to your MongoDB database. The JWT_SECRET can be any string of your choice. Additionally, include the TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN for Twilio integration. Sendgrid API used for sending emails
 
 4. Run `npm run dev` at the root directory to start the development server and launch the app in your browser.
 5. Navigate to http://localhost:4444/ to view the project.
